@@ -10,9 +10,10 @@ type Role struct {
 	Parent *Role  `json:"parent"`
 
 	permissions map[string]bool
+	engine      *Engine
 }
 
-func NewRole(id string) *Role {
+func (e *Engine) NewRole(id string) *Role {
 	if strings.Contains(id, ":") || id == "" {
 		panic("invalid id. Id cannot be empty or contain ':'")
 	}
@@ -20,11 +21,12 @@ func NewRole(id string) *Role {
 	return &Role{
 		Id:          id,
 		permissions: make(map[string]bool),
+		engine:      e,
 	}
 }
 
-func NewRoleWithParent(id string, parent *Role) *Role {
-	role := NewRole(id)
+func (e *Engine) NewRoleWithParent(id string, parent *Role) *Role {
+	role := e.NewRole(id)
 	role.Parent = parent
 
 	return role
@@ -52,6 +54,11 @@ func (r *Role) hasPermission(resource *Resource, action *Action) bool {
 		return true
 	}
 
+	// check if the parent has the permission
+	if r.Parent != nil {
+		return r.Parent.hasPermission(resource, action)
+	}
+
 	return false
 }
 
@@ -64,31 +71,6 @@ func (r *Role) registerPermission(resource *Resource, action *Action) error {
 
 	// add the permission
 	r.permissions[aKey] = true
-
-	// add the parent permissions
-	err := r.addParentPermissions(r.Parent)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *Role) addParentPermissions(currentParent *Role) error {
-	if currentParent == nil {
-		return nil
-	}
-
-	for k := range currentParent.permissions {
-		r.permissions[k] = true
-	}
-
-	if currentParent.Parent != nil {
-		err := r.addParentPermissions(currentParent.Parent)
-		if err != nil {
-			return err
-		}
-	}
 
 	return nil
 }
