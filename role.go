@@ -54,6 +54,11 @@ func (r *Role) hasPermission(resource *Resource, action *Action) bool {
 		return true
 	}
 
+	// check if the parent has the permission
+	if r.Parent != nil {
+		return r.Parent.hasPermission(resource, action)
+	}
+
 	return false
 }
 
@@ -66,31 +71,6 @@ func (r *Role) registerPermission(resource *Resource, action *Action) error {
 
 	// add the permission
 	r.permissions[aKey] = true
-
-	// add the parent permissions
-	err := r.addParentPermissions(r.Parent)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *Role) addParentPermissions(currentParent *Role) error {
-	if currentParent == nil {
-		return nil
-	}
-
-	for k := range currentParent.permissions {
-		r.permissions[k] = true
-	}
-
-	if currentParent.Parent != nil {
-		err := r.addParentPermissions(currentParent.Parent)
-		if err != nil {
-			return err
-		}
-	}
 
 	return nil
 }

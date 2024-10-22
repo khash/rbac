@@ -5,6 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="671cf9fc-2b2a-42c5-b162-b75ed7e92cdb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/rbac.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/engine.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/action.go" beforeDir="false" afterPath="$PROJECT_DIR$/action.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resource.go" beforeDir="false" afterPath="$PROJECT_DIR$/resource.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/role.go" beforeDir="false" afterPath="$PROJECT_DIR$/role.go" afterDir="false" />
@@ -51,7 +56,7 @@
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "dev",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
     "last_opened_file_path": "/Users/khash/work/rbac",
