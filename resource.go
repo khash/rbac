@@ -4,16 +4,22 @@ import "strings"
 
 type Resource struct {
 	Id string `json:"id"`
+	e  *Engine
 }
 
-func NewResource(id string) *Resource {
+func (e *Engine) NewResource(id string) *Resource {
 	if strings.Contains(id, ":") || id == "" {
 		panic("invalid id. Id cannot be empty or contain ':'")
 	}
 
-	return &Resource{
+	resource := &Resource{
 		Id: id,
+		e:  e,
 	}
+
+	e.resources[id] = resource
+
+	return resource
 }
 
 func (r *Resource) String() string {

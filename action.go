@@ -4,16 +4,22 @@ import "strings"
 
 type Action struct {
 	Id string `json:"id"`
+	e  *Engine
 }
 
-func NewAction(id string) *Action {
+func (e *Engine) NewAction(id string) *Action {
 	if strings.Contains(id, ":") || id == "" {
 		panic("invalid id. Id cannot be empty or contain ':'")
 	}
 
-	return &Action{
+	action := &Action{
 		Id: id,
+		e:  e,
 	}
+
+	e.actions[id] = action
+
+	return action
 }
 
 func (a *Action) String() string {

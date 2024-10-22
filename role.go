@@ -10,9 +10,10 @@ type Role struct {
 	Parent *Role  `json:"parent"`
 
 	permissions map[string]bool
+	engine      *Engine
 }
 
-func NewRole(id string) *Role {
+func (e *Engine) NewRole(id string) *Role {
 	if strings.Contains(id, ":") || id == "" {
 		panic("invalid id. Id cannot be empty or contain ':'")
 	}
@@ -20,11 +21,12 @@ func NewRole(id string) *Role {
 	return &Role{
 		Id:          id,
 		permissions: make(map[string]bool),
+		engine:      e,
 	}
 }
 
-func NewRoleWithParent(id string, parent *Role) *Role {
-	role := NewRole(id)
+func (e *Engine) NewRoleWithParent(id string, parent *Role) *Role {
+	role := e.NewRole(id)
 	role.Parent = parent
 
 	return role

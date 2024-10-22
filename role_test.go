@@ -5,8 +5,9 @@ import (
 )
 
 func TestNewRole(t *testing.T) {
+	e := NewEngine()
 	id := "member"
-	role := NewRole(id)
+	role := e.NewRole(id)
 
 	if role.Id != id {
 		t.Errorf("Expected role Id to be %s, but got %s", id, role.Id)
@@ -18,9 +19,10 @@ func TestNewRole(t *testing.T) {
 }
 
 func TestRoleKey(t *testing.T) {
-	role := NewRole("member")
-	resource := NewResource("door")
-	action := NewAction("open")
+	e := NewEngine()
+	role := e.NewRole("member")
+	resource := e.NewResource("door")
+	action := e.NewAction("open")
 
 	key := role.key(resource, action)
 	expectedKey := "door:open"
@@ -31,9 +33,10 @@ func TestRoleKey(t *testing.T) {
 }
 
 func TestRegisterPermissionSingle(t *testing.T) {
-	member := NewRole("member")
-	door := NewResource("door")
-	open := NewAction("open")
+	e := NewEngine()
+	member := e.NewRole("member")
+	door := e.NewResource("door")
+	open := e.NewAction("open")
 
 	err := member.RegisterPermission(door, open)
 
@@ -46,7 +49,7 @@ func TestRegisterPermissionSingle(t *testing.T) {
 		t.Errorf("Expected permission to exist, but it doesn't")
 	}
 
-	close := NewAction("close")
+	close := e.NewAction("close")
 	ok = member.HasPermission(door, close)
 	if ok {
 		t.Errorf("Expected permission NOT to exist, but it does")
@@ -54,16 +57,17 @@ func TestRegisterPermissionSingle(t *testing.T) {
 }
 
 func TestRegisterPermissionsInherited(t *testing.T) {
-	member := NewRole("member")
-	door := NewResource("door")
-	open := NewAction("open")
+	e := NewEngine()
+	member := e.NewRole("member")
+	door := e.NewResource("door")
+	open := e.NewAction("open")
 	err := member.RegisterPermission(door, open)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
 	}
 
-	owner := NewRoleWithParent("owner", member)
-	close := NewAction("close")
+	owner := e.NewRoleWithParent("owner", member)
+	close := e.NewAction("close")
 	err = owner.RegisterPermission(door, close)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
@@ -94,8 +98,68 @@ func TestRegisterPermissionsInherited(t *testing.T) {
 	}
 }
 
+func TestPermissionsWithGrandparent(t *testing.T) {
+	e := NewEngine()
+	grandparent := e.NewRole("grandparent")
+	parent := e.NewRoleWithParent("parent", grandparent)
+	child := e.NewRoleWithParent("child", parent)
+
+	door := e.NewResource("door")
+	openAct := e.NewAction("open")
+
+	// grandparent has permission to open the door
+	err := grandparent.RegisterPermission(door, openAct)
+	if err != nil {
+		t.Errorf("Expected no error, but got %v", err)
+	}
+
+	// child should have permission to open the door
+	ok := child.HasPermission(door, openAct)
+	if !ok {
+		t.Errorf("Expected permission to exist, but it doesn't")
+	}
+
+	// parent should have permission to open the door
+	ok = parent.HasPermission(door, openAct)
+	if !ok {
+		t.Errorf("Expected permission to exist, but it doesn't")
+	}
+
+	// grandparent should have permission to open the door
+	ok = grandparent.HasPermission(door, openAct)
+	if !ok {
+		t.Errorf("Expected permission to exist, but it doesn't")
+	}
+
+	// parent should have permission to close the door
+	closeAct := e.NewAction("close")
+	err = parent.RegisterPermission(door, closeAct)
+	if err != nil {
+		t.Errorf("Expected no error, but got %v", err)
+	}
+
+	// child should have permission to close the door
+	ok = child.HasPermission(door, closeAct)
+	if !ok {
+		t.Errorf("Expected permission to exist, but it doesn't")
+	}
+
+	// parent should have permission to close the door
+	ok = parent.HasPermission(door, closeAct)
+	if !ok {
+		t.Errorf("Expected permission to exist, but it doesn't")
+	}
+
+	// grandparent shouldn't have permission to close the door
+	ok = grandparent.HasPermission(door, closeAct)
+	if ok {
+		t.Errorf("Expected permission NOT to exist, but it does")
+	}
+}
+
 func TestString(t *testing.T) {
-	role := NewRole("member")
+	e := NewEngine()
+	role := e.NewRole("member")
 
 	if role.String() != "member" {
 		t.Errorf("Expected role string to be testRole, but got %s", role.String())
@@ -103,9 +167,10 @@ func TestString(t *testing.T) {
 }
 
 func TestReRegisterPermission(t *testing.T) {
-	member := NewRole("member")
-	door := NewResource("door")
-	open := NewAction("open")
+	e := NewEngine()
+	member := e.NewRole("member")
+	door := e.NewResource("door")
+	open := e.NewAction("open")
 	err := member.RegisterPermission(door, open)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
